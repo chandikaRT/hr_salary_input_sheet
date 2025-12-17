@@ -1,3 +1,3 @@
-import . from salary_input
-import . from salary_input_audit
-import . from salary_input_wizard
+from . import salary_input
+from . import salary_input_audit
+from . import salary_input_wizard
