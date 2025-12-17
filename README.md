@@ -1,0 +1,1 @@
+# hr_salary_input_manager
