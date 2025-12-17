@@ -43,6 +43,18 @@
         </field>
     </record>
 
+    <record id="action_hr_salary_input" model="ir.actions.act_window">
+        <field name="name">Salary Inputs</field>
+        <field name="res_model">hr.salary.input</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_hr_salary_input_tree"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create salary inputs for employees here.
+            </p>
+        </field>
+    </record>
+
     <menuitem id="menu_hr_salary_input_root" name="Salary Input Manager" parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root"/>
     <menuitem id="menu_hr_salary_input_manage" name="Manage Inputs" parent="menu_hr_salary_input_root" action="action_hr_salary_input"/>
 </odoo>
