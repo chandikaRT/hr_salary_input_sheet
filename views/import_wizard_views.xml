@@ -29,5 +29,5 @@
     <field name="target">new</field>
   </record>
 
-  <menuitem id="menu_payroll_input_import" name="Import Inputs" parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root" action="action_import_payroll_input_wizard"/>
+  <menuitem id="menu_hr_payroll_input_import" name="Import Inputs" parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root" action="action_import_payroll_input_wizard"/>
 </odoo>

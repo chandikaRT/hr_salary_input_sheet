@@ -28,12 +28,12 @@
     </field>
   </record>
 
-  <record id="action_payroll_input_sheet" model="ir.actions.act_window">
+  <record id="action_hr_payroll_input_sheet" model="ir.actions.act_window">
     <field name="name">Payroll Input Sheets</field>
     <field name="res_model">hr.payroll.input.sheet</field>
     <field name="view_mode">tree,form</field>
   </record>
 
-  <menuitem id="menu_payroll_input_root" name="Payroll Inputs" parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root"/>
-  <menuitem id="menu_payroll_input_sheet" name="Sheets" parent="menu_payroll_input_root" action="action_payroll_input_sheet"/>
+  <menuitem id="menu_hr_payroll_input_root" name="Payroll Inputs" parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root"/>
+  <menuitem id="menu_hr_payroll_input_sheet" name="Sheets" parent="menu_hr_payroll_input_root" action="action_hr_payroll_input_sheet"/>
 </odoo>
