@@ -1,6 +1,8 @@
 from odoo import models, fields, api
 import base64
 import xlrd
+from odoo.exceptions import ValidationError
+from dateutil.relativedelta import relativedelta
 
 class ImportPayrollInputWizard(models.TransientModel):
     _name = 'hr.payroll.input.import.wizard'
@@ -8,8 +10,7 @@ class ImportPayrollInputWizard(models.TransientModel):
 
     file = fields.Binary('Excel File', required=True)
     filename = fields.Char('File Name')
-    month = fields.Selection([(str(i), str(i)) for i in range(1, 13)], string="Month", required=True)
-    year = fields.Integer('Year', required=True)
+    date = fields.Date(string="Date", required=True)
     sheet_ref = fields.Many2one('hr.payroll.input.sheet', string='Payroll Input Sheet')
 
     def action_import(self):
@@ -17,7 +18,10 @@ class ImportPayrollInputWizard(models.TransientModel):
         if not self.file:
             return
         data = base64.b64decode(self.file)
-        workbook = xlrd.open_workbook(file_contents=data)
+        try:
+            workbook = xlrd.open_workbook(file_contents=data)
+        except Exception as e:
+            raise ValidationError("The uploaded file is not a valid Excel file.")
         sheet = workbook.sheet_by_index(0)
 
         lines = []
@@ -35,8 +39,7 @@ class ImportPayrollInputWizard(models.TransientModel):
                 }))
 
         payroll_sheet = self.env['hr.payroll.input.sheet'].create({
-            'month': self.month,
-            'year': self.year,
+            'date': self.date,
             'line_ids': lines,
         })
         self.sheet_ref = payroll_sheet
@@ -48,24 +51,3 @@ class ImportPayrollInputWizard(models.TransientModel):
             'res_id': payroll_sheet.id,
             'target': 'current',
         }
-
-    def action_create_inputs(self):
-        self.ensure_one()
-        if not self.sheet_ref:
-            return
-        for line in self.sheet_ref.line_ids:
-            input_type = self.env['hr.salary.input'].search([('name', '=', line.input_name)], limit=1)
-            if not input_type:
-                input_type = self.env['hr.salary.input'].create({'name': line.input_name})
-            payslips = self.env['hr.payslip'].search([
-                ('employee_id', '=', line.employee_id.id),
-                ('date_from', '>=', f'{self.year}-{self.month}-01'),
-                ('date_to', '<=', f'{self.year}-{self.month}-31'),
-            ])
-            for slip in payslips:
-                self.env['hr.payslip.input'].create({
-                    'name': input_type.name,
-                    'amount': line.amount,
-                    'slip_id': slip.id,
-                    'code': input_type.code,
-                })

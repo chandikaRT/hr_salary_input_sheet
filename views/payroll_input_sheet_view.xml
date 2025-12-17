@@ -7,8 +7,7 @@
         <sheet>
           <group>
             <field name="name"/>
-            <field name="month"/>
-            <field name="year"/>
+            <field name="date"/>
             <field name="state"/>
           </group>
           <notebook>
@@ -24,6 +23,10 @@
             </page>
           </notebook>
         </sheet>
+        <footer>
+          <button string="Apply to Payslips" type="object" name="action_apply_to_payslips" class="btn-primary"/>
+          <button string="Cancel" class="btn-secondary" special="cancel"/>
+        </footer>
       </form>
     </field>
   </record>
