@@ -1,4 +1,8 @@
 from odoo import models, fields, api
+import base64
+import xlrd
+from odoo.exceptions import ValidationError
+from dateutil.relativedelta import relativedelta
 
 class PayrollInputSheet(models.Model):
     _name = 'hr.payroll.input.sheet'
@@ -8,6 +12,8 @@ class PayrollInputSheet(models.Model):
     date = fields.Date(string='Date', required=True)
     state = fields.Selection([('draft', 'Draft'), ('done', 'Done')], default='draft')
     line_ids = fields.One2many('hr.payroll.input.sheet.line', 'sheet_id', string='Lines')
+    file = fields.Binary('Excel File')
+    filename = fields.Char('File Name')
 
     def _compute_name(self):
         for rec in self:
@@ -31,12 +37,28 @@ class PayrollInputSheet(models.Model):
                     'code': input_type.code,
                 })
 
-class PayrollInputSheetLine(models.Model):
-    _name = 'hr.payroll.input.sheet.line'
-    _description = 'Payroll Input Sheet Line'
+    def action_import(self):
+        self.ensure_one()
+        if not self.file:
+            raise ValidationError("No file uploaded.")
+        data = base64.b64decode(self.file)
+        try:
+            workbook = xlrd.open_workbook(file_contents=data)
+        except Exception as e:
+            raise ValidationError("The uploaded file is not a valid Excel file.")
+        sheet = workbook.sheet_by_index(0)
 
-    sheet_id = fields.Many2one('hr.payroll.input.sheet', string='Sheet')
-    employee_id = fields.Many2one('hr.employee', string='Employee', required=True)
-    input_name = fields.Char('Input Name', required=True)
-    amount = fields.Float('Amount', required=True)
-    applied = fields.Boolean('Applied', default=False)
+        lines = []
+        for row in range(1, sheet.nrows):
+            employee_code = sheet.cell(row, 0).value
+            input_name = sheet.cell(row, 1).value
+            amount = sheet.cell(row, 2).value
+
+            employee = self.env['hr.employee'].search([('barcode', '=', employee_code)], limit=1)
+            if employee:
+                lines.append((0, 0, {
+                    'employee_id': employee.id,
+                    'input_name': input_name,
+                    'amount': amount,
+                }))
+        self.line_ids = lines
