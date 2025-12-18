@@ -48,8 +48,8 @@
             <!-- IMPORT TAB -->
             <page string="Import">
               <group>
-                <field name="file" filename="filename"/>
-                <field name="filename" invisible="1"/>
+                <field name="import_file" filename="import_filename"/>
+                <field name="import_filename" invisible="1"/>
               </group>
             </page>
 
